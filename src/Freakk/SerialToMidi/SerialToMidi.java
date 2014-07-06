@@ -27,7 +27,7 @@ public class SerialToMidi {
         String portName;
         private static MidiOut midiout;
         boolean keepreading;
-        
+        boolean started;
 
         /**
          * Standard constructor.
@@ -35,9 +35,8 @@ public class SerialToMidi {
          * @param midiout, the midi device where to send messages
          * @throws Exception
          */
-        public SerialToMidi(String port, MidiOut out) throws Exception {
-            portName = port;
-            midiout = out;
+        public SerialToMidi() throws Exception {
+        	started = false;
         	/*
                 //Extract native libs
                 if(NativeUtils.detectOS() == OS.Windows){
@@ -71,7 +70,7 @@ public class SerialToMidi {
                 InputStream is= this.port.getInputStream();
                 final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                 keepreading = true;
-
+                started = true;
                 new Thread(new Runnable() {
 
                         @Override
@@ -113,7 +112,7 @@ public class SerialToMidi {
                                 }
                         }
                 }).start();
-
+                System.out.println("started");
         }
 
         /**
@@ -121,8 +120,11 @@ public class SerialToMidi {
          */
         public void stop()
         {
-                keepreading = false;
-                port.close();
+                if(started){
+                	keepreading = false;
+                	port.close();
+                	started = false;
+                }
         }
 
         /**
@@ -151,6 +153,17 @@ public class SerialToMidi {
                         logger.severe("Error: "+e.getMessage());
                         System.exit(-1);
                 }
+        }
+        
+        
+        // SETTERS
+        // -----------------------------------------------------
+        public void setSerialPort(String str) {
+        	portName = str;
+        }
+        
+        public void setMidiPort(MidiOut m){
+        	midiout = m;
         }
 
 }

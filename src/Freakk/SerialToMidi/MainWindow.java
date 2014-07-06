@@ -5,20 +5,16 @@ import gnu.io.CommPortIdentifier;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Label;
 import java.awt.Toolkit;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.Synthesizer;
 import javax.sound.midi.Transmitter;
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JTextArea;
 
 import java.awt.FlowLayout;
 
@@ -31,15 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-
-import javax.swing.JButton;
-
-import java.awt.GridBagLayout;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -48,6 +37,7 @@ import java.awt.Component;
 
 import javax.swing.Box;
 
+@SuppressWarnings("serial")
 public class MainWindow extends JFrame { // Your class name
 
 	// Private Fields
@@ -59,11 +49,15 @@ public class MainWindow extends JFrame { // Your class name
 			"RD", "TT1", "TT2", "FT2" };
 	private static final String ImmutableMap = null;
 	private static final Map<String, Integer> noteValues = createMap();
-	private static MidiOut MidiOut;
+	private static MidiOut midiout;
 	private MidiDevice.Info[] info;
 	private static List<MidiDevice> devices;
+	private static MidiDevice midiDeviceActive;
 	private static List<String> serialPorts;
-
+	private static String serialPortActive;
+	private Thread  stmThread	;
+    private SerialReader2 STM = null;
+    
 	// Public Fields
 	// -----------------------------------
 
@@ -74,7 +68,7 @@ public class MainWindow extends JFrame { // Your class name
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(800, 500);
-
+		
 		// Center Window on Screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height
@@ -106,7 +100,24 @@ public class MainWindow extends JFrame { // Your class name
         }
         JComboBox serialPortCombo = new JComboBox(serialPorts.toArray());
 		serialPortCombo.setPreferredSize(new Dimension(180, 20));
-		
+		serialPortCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                //
+                // Get the source of the component, which is our combo
+                // box.
+                //
+                JComboBox comboBox = (JComboBox) event.getSource();
+                serialPortActive = comboBox.getSelectedItem().toString();
+                try {
+                	STM = new SerialReader2(serialPortActive);
+			        stmThread = new Thread(STM);
+			        stmThread.start();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        });
 		// MIDI Out Selection (MIDI loopback driver)
 		info = MidiSystem.getMidiDeviceInfo();
 		devices = new ArrayList<MidiDevice>();
@@ -131,9 +142,10 @@ public class MainWindow extends JFrame { // Your class name
                 //
                 JComboBox comboBox = (JComboBox) event.getSource();
 
-                MidiDevice selected = devices.get(comboBox.getSelectedIndex());
+                midiDeviceActive = devices.get(comboBox.getSelectedIndex());
                 try {
-					if(MidiOut.SetDevice(selected)) System.out.println("MIDI Out Port set to \""+comboBox.getItemAt(comboBox.getSelectedIndex())+"\"");
+					if(midiout.SetDevice(midiDeviceActive)) System.out.println("MIDI Out Port set to \""+comboBox.getItemAt(comboBox.getSelectedIndex())+"\"");
+					StartSerialToMidi();
 				} catch (MidiUnavailableException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -165,7 +177,7 @@ public class MainWindow extends JFrame { // Your class name
 		// Implement Serial To Midi
 
 		// Serial read to do
-		MidiOut = new MidiOut();
+		midiout = new MidiOut();
 
 		// Add Channel Strips
 		for (int i = 0; i < numChannels; i++) {
@@ -219,12 +231,23 @@ public class MainWindow extends JFrame { // Your class name
 		public void actionPerformed(ActionEvent e) {
 			int[] command = { chan, key, vel };
 			try {
-				MidiOut.SendNoteOn(command);
+				midiout.SendNoteOn(command);
 			} catch (InvalidMidiDataException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				//System.out.println("MIDI Out error!");
 			}
+		}
+	}
+	
+	public void StartSerialToMidi(){
+		
+		try {
+			//STM.Start(serialPortActive);
+			//STM = new SerialReader2(portName);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }
