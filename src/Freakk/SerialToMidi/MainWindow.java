@@ -56,7 +56,7 @@ public class MainWindow extends JFrame { // Your class name
 	private static List<String> serialPorts;
 	private static String serialPortActive;
 	private Thread  stmThread	;
-    private SerialReader2 STM = null;
+    private SerialToMidi STM = null;
     
 	// Public Fields
 	// -----------------------------------
@@ -109,7 +109,7 @@ public class MainWindow extends JFrame { // Your class name
                 JComboBox comboBox = (JComboBox) event.getSource();
                 serialPortActive = comboBox.getSelectedItem().toString();
                 try {
-                	STM = new SerialReader2(serialPortActive);
+                	STM = new SerialToMidi(serialPortActive, midiout);
 			        stmThread = new Thread(STM);
 			        stmThread.start();
 				} catch (Exception e) {
