@@ -58,6 +58,10 @@ public class MainWindow extends JFrame { // Your class name
 	private Thread  stmThread	;
     private SerialToMidi STM = null;
     
+    // Additional Controls
+    private static float gain = 1;  // boost
+    private static float threshold = 0;  // gate threshold
+    
 	// Public Fields
 	// -----------------------------------
 
@@ -68,6 +72,10 @@ public class MainWindow extends JFrame { // Your class name
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(800, 500);
+		
+		// ------------------------------------------------ 
+		// 	GUI 
+		// ------------------------------------------------ 
 		
 		// Center Window on Screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -83,12 +91,9 @@ public class MainWindow extends JFrame { // Your class name
 		getContentPane().add(top, BorderLayout.PAGE_START);
 		top.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		// SERIAL PORT
-
-		/**
-         * Lists available serial ports.
-         * @return
-         */
+		// ------------------------------------------------ 
+		// 	SERIAL MIDI IN READER 
+		// ------------------------------------------------
         List<String> serialPorts = new ArrayList<String>();
         @SuppressWarnings("unchecked")
 		Enumeration<CommPortIdentifier> ports = CommPortIdentifier.getPortIdentifiers();
@@ -118,10 +123,14 @@ public class MainWindow extends JFrame { // Your class name
 				}
             }
         });
-		// MIDI Out Selection (MIDI loopback driver)
+
+		// ------------------------------------------------ 
+		// 	MIDI OUT 
+		// ------------------------------------------------
 		info = MidiSystem.getMidiDeviceInfo();
 		devices = new ArrayList<MidiDevice>();
 		List<String> midiPortNamesList = new ArrayList<String>();
+		
 		for (int i = 0; i < info.length; i++) {
 			MidiDevice dev = MidiSystem.getMidiDevice(info[i]);
 			if ( ! (dev instanceof Sequencer) && ! (dev instanceof Synthesizer) && ! (dev instanceof Transmitter) && (dev.getMaxTransmitters()>=0)) {
@@ -132,6 +141,8 @@ public class MainWindow extends JFrame { // Your class name
 			midiPortNamesList.add(info[i].getName());
 			}
 		}
+		
+		midiout = new MidiOut();
 		JComboBox midiOutCombo = new JComboBox(midiPortNamesList.toArray());
 		midiOutCombo.setPreferredSize(new Dimension(180, 20));
 		midiOutCombo.addActionListener(new ActionListener() {
@@ -141,20 +152,18 @@ public class MainWindow extends JFrame { // Your class name
                 // box.
                 //
                 JComboBox comboBox = (JComboBox) event.getSource();
-
                 midiDeviceActive = devices.get(comboBox.getSelectedIndex());
-                try {
+				try {
 					if(midiout.SetDevice(midiDeviceActive)) System.out.println("MIDI Out Port set to \""+comboBox.getItemAt(comboBox.getSelectedIndex())+"\"");
-					StartSerialToMidi();
 				} catch (MidiUnavailableException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-                
+				StartSerialToMidi();
             }
         });
-		//midiOutCombo.setSelectedItem(midiOutCombo.getItemAt(0));
-		JLabel serialPortLabel = new JLabel("SerialPort");
+
+		JLabel serialPortLabel = new JLabel("Input Port");
 		serialPortLabel.setForeground(Color.WHITE);
 		top.add(serialPortLabel);
 		top.add(serialPortCombo);
@@ -167,17 +176,10 @@ public class MainWindow extends JFrame { // Your class name
 		top.add(MidiOutLabel);
 		top.add(midiOutCombo);
 
-		
-
 		JPanel bottom = new JPanel();
 		bottom.setSize(800, 400);
 		getContentPane().add(bottom, BorderLayout.CENTER);
 		bottom.setLayout(new GridLayout(0, 8, 0, 0));
-
-		// Implement Serial To Midi
-
-		// Serial read to do
-		midiout = new MidiOut();
 
 		// Add Channel Strips
 		for (int i = 0; i < numChannels; i++) {
@@ -188,7 +190,6 @@ public class MainWindow extends JFrame { // Your class name
 			bottom.add(channels[i]);
 
 		}
-
 		setVisible(true);
 
 	}
@@ -250,4 +251,9 @@ public class MainWindow extends JFrame { // Your class name
 			e.printStackTrace();
 		}
 	}
+	
+	public void SetGain(float f) { gain = f; }
+	public void SetThreshold(float f) { threshold = f; }
+	public float GetGain() { return gain; }
+	public float GetThreshold() { return threshold; }
 }

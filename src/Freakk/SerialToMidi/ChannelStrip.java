@@ -1,25 +1,15 @@
 package Freakk.SerialToMidi;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
-
 import javax.swing.JPanel;
-
-import java.awt.GridLayout;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBox;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
-
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 
 
 public class ChannelStrip extends JPanel{
