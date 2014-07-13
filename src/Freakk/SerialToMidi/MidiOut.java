@@ -49,4 +49,9 @@ public class MidiOut {
 		long timeStamp = -1;
 		rcvr.send(out, timeStamp);
 	}
+	
+	public void SendShortMessage( ShortMessage smsg){
+		long timeStamp = -1;
+		rcvr.send(smsg, timeStamp);
+	}
 }

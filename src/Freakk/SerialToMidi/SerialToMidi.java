@@ -1,8 +1,6 @@
 package Freakk.SerialToMidi;
 
 import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 
 import java.io.BufferedReader;
@@ -10,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.CharBuffer;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.ShortMessage;
@@ -63,21 +60,30 @@ public class SerialToMidi implements Runnable{
 				running = true;
 				while(running){
 		            try {
-		            	    char buf[] = new char[3];
-							int numChars = reader.read(buf);
+		            	    byte buf[] = new byte[3];
+							int numChars = input.read(buf);
 //							System.out.println("signed: "+Integer.toBinaryString((int)buf[0]));
 //							System.out.println("unsigned: "+Integer.toBinaryString((int)(buf[0] & 0xff)));
-							int cmd = (int)(buf[0] & 0xF); // first Nibble
-							int channel = (int)(buf[0] >> 4); // second Nibble
-							int key = (int)buf[1] ;
-							int vel = (int)buf[2] ;
-							System.out.println("received "+numChars);
-//							System.out.println(Integer.toBinaryString(msg)+" "+Integer.toBinaryString(channel)+" "+key+" "+vel);
-						    System.out.println(cmd+" "+" "+key+" "+vel);
+							int msg= buf[0] & 0xFF;
+							int cmd = (int)(msg >> 4); // second Nibble
+							int chan = (int)(msg & 0xF); // first Nibble
+							int key = buf[1] & 0xFF;
+							int vel = buf[2] & 0xFF;
+//							System.out.println("received "+numChars);
+//							System.out.println(Integer.toBinaryString(msg)+" "+Integer.toBinaryString(chan)+" "+key+" "+vel);
+//						    System.out.println(Integer.toBinaryString(msg & 0xFF));
+//							System.out.println(buf[0]+" "+buf[1]+" "+buf[2]);
+							System.out.println((cmd << 4)+" "+chan+" "+key+" "+vel);
+							/*
 						    int[] m = {MIDI_CHANNEL,key,vel};
 							if(cmd == NOTE_ON_CMD) midiout.SendNoteOn(m);
 							else if(cmd == NOTE_OFF_CMD) midiout.SendNoteOff(m);
 							else System.err.println("error");
+							*/
+							ShortMessage smsg = new ShortMessage();
+							smsg.setMessage(cmd<<4, chan, key, vel);
+							midiout.SendShortMessage(smsg);
+							
 					} catch (NumberFormatException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -94,5 +100,6 @@ public class SerialToMidi implements Runnable{
     public boolean isRunning(){
     	return running;
     }
-    	
+
+
 }

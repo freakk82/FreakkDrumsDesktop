@@ -59,9 +59,7 @@ public class MainWindow extends JFrame { // Your class name
     private SerialToMidi STM = null;
     
     // Additional Controls
-    private static float gain = 1;  // boost
-    private static float threshold = 0;  // gate threshold
-    
+
 	// Public Fields
 	// -----------------------------------
 
@@ -252,8 +250,4 @@ public class MainWindow extends JFrame { // Your class name
 		}
 	}
 	
-	public void SetGain(float f) { gain = f; }
-	public void SetThreshold(float f) { threshold = f; }
-	public float GetGain() { return gain; }
-	public float GetThreshold() { return threshold; }
 }

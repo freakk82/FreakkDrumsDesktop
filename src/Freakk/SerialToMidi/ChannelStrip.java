@@ -25,6 +25,9 @@ public class ChannelStrip extends JPanel{
 	public static final int defaultWidth = 100;
 	// Public Fields
 	// -----------------------------------
+	public JCheckBox muteCheckBox;
+	public JSlider slider;
+	
 	public JButton playBtn;
 	
 	// Constructors
@@ -39,14 +42,14 @@ public class ChannelStrip extends JPanel{
 		add(Box.createRigidArea(new Dimension(10, 10)));
 		
 		// Mute Checkbox
-		JCheckBox muteCheckBox = new JCheckBox("");
+		muteCheckBox = new JCheckBox("");
 		muteCheckBox.setBackground(Color.DARK_GRAY);
 		muteCheckBox.setAlignmentX(Component.CENTER_ALIGNMENT);
 		add(muteCheckBox);
 		add(Box.createRigidArea(new Dimension(10, 10)));
 		
 		// Volume Slider
-		JSlider slider = new JSlider();
+		slider = new JSlider();
 		slider.setForeground(Color.WHITE);
 		slider.setPaintLabels(true);
 		slider.setBorder(null);
@@ -63,7 +66,6 @@ public class ChannelStrip extends JPanel{
 		add(playBtn);
 		add(Box.createRigidArea(new Dimension(10, 10)));
 
-		
 	}
 	
 	public ChannelStrip(String name){
@@ -73,6 +75,7 @@ public class ChannelStrip extends JPanel{
 	public ChannelStrip(){
 		this("CH "+ (++channelNumber));
 	}
+	
 	// Private Methods
 	// -----------------------------------
 		
