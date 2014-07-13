@@ -12,6 +12,7 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequencer;
+import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Synthesizer;
 import javax.sound.midi.Transmitter;
 import javax.swing.JFrame;
@@ -24,6 +25,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -45,8 +47,17 @@ public class MainWindow extends JFrame { // Your class name
 	private static final int numChannels = 8;
 	private static final int C1 = 36;
 	private static final ChannelStrip channels[] = new ChannelStrip[numChannels];
-	private static final String channelNames[] = { "BD", "SN", "HH", "CR1",
-			"RD", "TT1", "TT2", "FT2" };
+	private static final List<Integer> channelNoteValues= Arrays.asList(
+			C1,
+			C1 + 2,
+			C1 + 6,
+			C1 + 13,
+			C1 + 15,
+			C1 + 12,
+			C1 + 11,
+			C1 + 5);
+	private static final List<String> channelNames = Arrays.asList(
+			"BD", "SN", "HH", "CR1","RD", "TT1", "TT2", "FT2" );
 	private static final String ImmutableMap = null;
 	private static final Map<String, Integer> noteValues = createMap();
 	private static MidiOut midiout;
@@ -112,7 +123,7 @@ public class MainWindow extends JFrame { // Your class name
                 JComboBox comboBox = (JComboBox) event.getSource();
                 serialPortActive = comboBox.getSelectedItem().toString();
                 try {
-                	STM = new SerialToMidi(serialPortActive, midiout);
+                	STM = new SerialToMidi(MainWindow.this,serialPortActive);
 			        stmThread = new Thread(STM);
 			        stmThread.start();
 				} catch (Exception e) {
@@ -181,10 +192,10 @@ public class MainWindow extends JFrame { // Your class name
 
 		// Add Channel Strips
 		for (int i = 0; i < numChannels; i++) {
-			channels[i] = new ChannelStrip(channelNames[i],
+			channels[i] = new ChannelStrip(channelNames.get(i),
 					(int) bottom.getWidth() / numChannels, bottom.getHeight());
 			channels[i].playBtn.addActionListener(new playBtnClick(noteValues
-					.get(channelNames[i])));
+					.get(channelNames.get(i))));
 			bottom.add(channels[i]);
 
 		}
@@ -194,16 +205,16 @@ public class MainWindow extends JFrame { // Your class name
 
 	// Private Methods
 	// -----------------------------------
-	private static Map<String, Integer> createMap() {
-		Map<String, Integer> result = new HashMap<String, Integer>();
-		result.put("BD", C1);
-		result.put("SN", C1 + 2);
-		result.put("HH", C1 + 6);
-		result.put("CR1", C1 + 13);
-		result.put("RD", C1 + 15);
-		result.put("TT1", C1 + 12);
-		result.put("TT2", C1 + 11);
-		result.put("FT2", C1 + 5);
+	private static Map<String,Integer> createMap() {
+		Map<String,Integer> result = new HashMap<String,Integer>();
+		result.put("BD",C1);
+		result.put("SN",C1 + 2);
+		result.put("HH",C1 + 6);
+		result.put("CR1",C1 + 13);
+		result.put("RD",C1 + 15);
+		result.put("TT1",C1 + 12);
+		result.put("TT2",C1 + 11);
+		result.put("FT2",C1 + 5);
 		return Collections.unmodifiableMap(result);
 	}
 
@@ -247,6 +258,21 @@ public class MainWindow extends JFrame { // Your class name
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	public void SendMidiShortMessage(ShortMessage smsg) throws InvalidMidiDataException{
+		int key = smsg.getData1();
+		int vel = smsg.getData2();
+		int channelIndex = channelNoteValues.indexOf(key);
+		//Apply Gain boost/cut
+		float gain = 1+(float)channels[channelIndex].getGain()/10.0f; // apply velocity multiplier from 0 to 3
+		vel = (int)(vel*gain);
+		if(vel>127) vel = 127;
+		
+		if(!channels[channelIndex].isMute()){ 
+			midiout.SendShortMessage(new ShortMessage(smsg.getCommand(), key, vel));
+			System.out.println(smsg.getCommand()+" "+key+" "+vel); // debug
 		}
 	}
 	

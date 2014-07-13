@@ -21,15 +21,20 @@ public class SerialToMidi implements Runnable{
     static SerialPort port;
     static CommPortIdentifier portId;
     static boolean running;
-    static MidiOut midiout;
+    static MainWindow mainWin;
     static int MIDI_CHANNEL = 10;
     static final int NOTE_ON_CMD = 13;
     static final int NOTE_OFF_CMD = 12;
+    // ---------------------------------
+    // PERSONAL MIXER ATTRIBUTES
+    // ---------------------------------
+    static int gateThreshold = 0;
+    static float gain = 1.0f;
     
-    public SerialToMidi(String prt, MidiOut midi) throws Exception
+    public SerialToMidi(MainWindow w, String prt) throws Exception
     {
+    	mainWin = w;
     	portName = prt;
-    	midiout = midi;
         System.out.println("Using port: " + portName);
         portId = CommPortIdentifier.getPortIdentifier(portName);
         port = (SerialPort)portId.open("FreakkDrums", 4000);
@@ -44,11 +49,6 @@ public class SerialToMidi implements Runnable{
                 SerialPort.PARITY_NONE);
         port.setInputBufferSize(3);
     } 
-    
-    public SerialToMidi(String prt, MidiOut midi, int channel) throws Exception{
-    	this(prt, midi);
-    	MIDI_CHANNEL = channel;
-    }
     
     public void Terminate() {
         running = false;
@@ -73,16 +73,10 @@ public class SerialToMidi implements Runnable{
 //							System.out.println(Integer.toBinaryString(msg)+" "+Integer.toBinaryString(chan)+" "+key+" "+vel);
 //						    System.out.println(Integer.toBinaryString(msg & 0xFF));
 //							System.out.println(buf[0]+" "+buf[1]+" "+buf[2]);
-							System.out.println((cmd << 4)+" "+chan+" "+key+" "+vel);
-							/*
-						    int[] m = {MIDI_CHANNEL,key,vel};
-							if(cmd == NOTE_ON_CMD) midiout.SendNoteOn(m);
-							else if(cmd == NOTE_OFF_CMD) midiout.SendNoteOff(m);
-							else System.err.println("error");
-							*/
-							ShortMessage smsg = new ShortMessage();
-							smsg.setMessage(cmd<<4, chan, key, vel);
-							midiout.SendShortMessage(smsg);
+//							System.out.println((cmd << 4)+" "+chan+" "+key+" "+vel);
+							
+							// Send Message to mainWin context to apply gate, gain and all personal mixing modifications
+							mainWin.SendMidiShortMessage(new ShortMessage(cmd<<4, chan, key, vel));
 							
 					} catch (NumberFormatException e) {
 						// TODO Auto-generated catch block
@@ -101,5 +95,5 @@ public class SerialToMidi implements Runnable{
     	return running;
     }
 
-
+    //
 }
