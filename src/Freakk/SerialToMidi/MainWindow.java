@@ -95,8 +95,9 @@ public class MainWindow extends JFrame { // Your class name
 		// Create Sub Panels
 		// TOP PANEL: Select Serial Port and MIDI Out
 		JPanel top = new JPanel();
-		top.setPreferredSize(new Dimension(800, 100));
-		top.setBackground(Color.DARK_GRAY);
+		top.setForeground(Color.GRAY);
+		top.setPreferredSize(new Dimension(800, 50));
+		top.setBackground(Color.BLACK);
 		getContentPane().add(top, BorderLayout.PAGE_START);
 		top.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
@@ -173,7 +174,7 @@ public class MainWindow extends JFrame { // Your class name
         });
 
 		JLabel serialPortLabel = new JLabel("Input Port");
-		serialPortLabel.setForeground(Color.WHITE);
+		serialPortLabel.setForeground(Color.LIGHT_GRAY);
 		top.add(serialPortLabel);
 		top.add(serialPortCombo);
 
@@ -181,12 +182,14 @@ public class MainWindow extends JFrame { // Your class name
 		top.add(horizontalGlue);
 
 		JLabel MidiOutLabel = new JLabel("MIDI Out Port");
-		MidiOutLabel.setForeground(Color.WHITE);
+		MidiOutLabel.setForeground(Color.LIGHT_GRAY);
 		top.add(MidiOutLabel);
 		top.add(midiOutCombo);
 
 		JPanel bottom = new JPanel();
-		bottom.setSize(800, 400);
+		bottom.setForeground(Color.GRAY);
+		bottom.setBackground(Color.BLACK);
+		bottom.setSize(800, 450);
 		getContentPane().add(bottom, BorderLayout.CENTER);
 		bottom.setLayout(new GridLayout(0, 8, 0, 0));
 
@@ -269,8 +272,7 @@ public class MainWindow extends JFrame { // Your class name
 		float gain = 1+(float)channels[channelIndex].getGain()/10.0f; // apply velocity multiplier from 0 to 3
 		vel = (int)(vel*gain);
 		if(vel>127) vel = 127;
-		
-		if(!channels[channelIndex].isMute()){ 
+		if(!channels[channelIndex].isMute() && vel > channels[channelIndex].getGateThreshold()){ 
 			midiout.SendShortMessage(new ShortMessage(smsg.getCommand(), key, vel));
 			System.out.println(smsg.getCommand()+" "+key+" "+vel); // debug
 		}
