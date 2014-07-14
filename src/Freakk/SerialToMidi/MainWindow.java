@@ -24,6 +24,8 @@ import javax.swing.JPanel;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,12 +34,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 import java.awt.Component;
 
 import javax.swing.Box;
+import javax.swing.border.EmptyBorder;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame { // Your class name
@@ -46,6 +52,9 @@ public class MainWindow extends JFrame { // Your class name
 	// -----------------------------------
 	private static final int numChannels = 8;
 	private static final int C1 = 36;
+	private static final Dimension frameSize = new Dimension(800,500);
+	private static final Dimension topSize = new Dimension(800,80);
+	private static final Dimension bottomSize = new Dimension(800,420);
 	private static final ChannelStrip channels[] = new ChannelStrip[numChannels];
 	private static final List<Integer> channelNoteValues= Arrays.asList(
 			C1,
@@ -80,7 +89,7 @@ public class MainWindow extends JFrame { // Your class name
 		super("FreakkDrums");
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setSize(800, 500);
+		setSize(frameSize);
 		
 		// ------------------------------------------------ 
 		// 	GUI 
@@ -90,13 +99,15 @@ public class MainWindow extends JFrame { // Your class name
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height
 				/ 2 - this.getSize().height / 2);
-		getContentPane().setLayout(new BorderLayout());
 
 		// Create Sub Panels
 		// TOP PANEL: Select Serial Port and MIDI Out
 		JPanel top = new JPanel();
 		top.setForeground(Color.GRAY);
-		top.setPreferredSize(new Dimension(800, 50));
+		top.setPreferredSize(topSize);
+		top.setMinimumSize(topSize);
+		top.setMaximumSize(topSize);
+		top.setSize(topSize);
 		top.setBackground(Color.BLACK);
 		getContentPane().add(top, BorderLayout.PAGE_START);
 		top.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -187,20 +198,67 @@ public class MainWindow extends JFrame { // Your class name
 		top.add(midiOutCombo);
 
 		JPanel bottom = new JPanel();
+		bottom.setBorder(new EmptyBorder(0, 10, 0, 10));
 		bottom.setForeground(Color.GRAY);
 		bottom.setBackground(Color.BLACK);
-		bottom.setSize(800, 450);
+		bottom.setPreferredSize(bottomSize);
+		bottom.setSize(bottomSize);
+		bottom.setMaximumSize(bottomSize);
+		bottom.setMinimumSize(bottomSize);
 		getContentPane().add(bottom, BorderLayout.CENTER);
-		bottom.setLayout(new GridLayout(0, 8, 0, 0));
+		bottom.setLayout(new GridLayout(0, 8, 10, 0));
 
 		// Add Channel Strips
 		for (int i = 0; i < numChannels; i++) {
 			channels[i] = new ChannelStrip(channelNames.get(i),
-					(int) bottom.getWidth() / numChannels, bottom.getHeight());
-			channels[i].playBtn.addActionListener(new playBtnClick(noteValues
-					.get(channelNames.get(i))));
-			bottom.add(channels[i]);
+					(int) (bottom.getWidth()) / numChannels, bottom.getHeight());
+//			channels[i].playBtn.addActionListener(new playBtnClick(noteValues
+//					.get(channelNames.get(i))));
 
+			channels[i].playBtn.addMouseListener(new MouseListener() {
+				@Override
+				public void mouseClicked(MouseEvent arg0) {
+					int y = arg0.getY();
+					int height = (int)((JButton) arg0.getSource()).getSize().getHeight();
+					int vel = (int)(-127 * ((double)(y-height)/height));
+					//System.out.println("vel: "+vel+" - h: "+ height+" - y: "+y);
+					ShortMessage smgs;
+					try {
+						smgs = new ShortMessage(ShortMessage.NOTE_ON, noteValues.get(((JButton) arg0.getSource()).getLabel()), vel);
+						SendMidiShortMessage(smgs);
+					} catch (InvalidMidiDataException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseExited(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
+			bottom.add(channels[i]);
 		}
 		setVisible(true);
 

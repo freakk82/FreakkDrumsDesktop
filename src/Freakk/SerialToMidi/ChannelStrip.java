@@ -30,6 +30,7 @@ import javax.swing.JSeparator;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.JComboBox;
+import javax.swing.border.EmptyBorder;
 
 
 public class ChannelStrip extends JPanel{
@@ -41,8 +42,8 @@ public class ChannelStrip extends JPanel{
 	final  boolean shouldFill = true;
 	final  boolean shouldWeightX = true;
 	final  boolean RIGHT_TO_LEFT = false;
-	public static final int defaultHeight = 400;
-	public static final int defaultWidth = 100;
+	public static int height = 400;
+	public static int width = 100; 
 	private  JKnob gateKnob;
 	private  int gain = 0;
 	private  int gateThreshold = 0;
@@ -71,15 +72,17 @@ public class ChannelStrip extends JPanel{
 	
 	// Constructors
 	// -----------------------------------
-	public ChannelStrip(String name, int width, int height){
+	public ChannelStrip(String name, int w, int h){
 		
 		channelName = name;
+		width = w;
+		height = h;
 		setBackground(Color.BLACK);
+		setPreferredSize(new Dimension(width, height) );
 		setSize(width, height);
 		// Layout
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		add(Box.createRigidArea(new Dimension(10, 10)));
-		
 		lblMute = new JLabel("NOTE");
 		lblMute.setToolTipText("Remap Output Note");
 		lblMute.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -292,12 +295,12 @@ public class ChannelStrip extends JPanel{
 	}
 	
 	public ChannelStrip(String name){
-		this(name, defaultWidth, defaultHeight);
+		this(name, width, height);
 	}
 
 	public ChannelStrip(){
 		this("CH "+ (++channelNumber));
-		setBorder(new LineBorder(Color.GRAY));
+		setBorder(new EmptyBorder(10, 10, 10, 10));
 	}
 	
 	// Private Methods
@@ -306,9 +309,15 @@ public class ChannelStrip extends JPanel{
 	// Public Methods
 	// -----------------------------------
     public void setWidth(int w){
-    	this.setSize(180,400);
+    	width = w;
+    	this.setPreferredSize( new Dimension(w,height) );
+    	this.setSize( new Dimension(w,height) );
     }
-    
+    public void setHeight(int h){
+    	height = h;
+    	this.setPreferredSize( new Dimension(width, h) );
+    	this.setSize( new Dimension(width, h) );
+    }
     // GETTERS
     public int getGain(){
     	return gain;
