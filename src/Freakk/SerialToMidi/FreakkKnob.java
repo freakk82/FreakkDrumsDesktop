@@ -8,17 +8,13 @@ import javax.swing.*;
 import java.awt.event.*;
 
 /**
- * JKnob.java - 
- *   A knob component.  The knob can be rotated by dragging 
- *   a spot on the knob around in a circle.
- *   The knob will report its position in radians when asked.
- *
- * @author Grant William Braught
- * @author Dickinson College
- * @version 12/4/2000
+ * FreakkKnob.java - 
+ *   A knob component evolved from Grant William Braught's FreakkKnob
+ * @author Francesco Iesu
+ * @version 13/07/2014
  */
 
-class JKnob 
+class FreakkKnob 
     extends JComponent
     implements MouseListener, MouseMotionListener, MouseWheelListener {
 
@@ -38,7 +34,7 @@ class JKnob
      * No-Arg constructor that initializes the position
      * of the knob to 0 radians (Up).
      */
-    public JKnob() {
+    public FreakkKnob() {
 	this(0);
     }
 
@@ -48,7 +44,7 @@ class JKnob
      *
      * @param initAngle the initial angle of the knob.
      */
-    public JKnob(double initTheta) {
+    public FreakkKnob(double initTheta) {
 	this(initTheta, Color.darkGray, Color.white);
     }
     
@@ -61,7 +57,7 @@ class JKnob
      * @param initColor the color of the knob.
      * @param initSpotColor the color of the spot.
      */
-    public JKnob(double initTheta, Color initKnobColor, 
+    public FreakkKnob(double initTheta, Color initKnobColor, 
 		 Color initSpotColor) {
 		theta = initTheta;
 		pressedOnSpot = false;
@@ -74,7 +70,7 @@ class JKnob
     }
 
     /**
-     * Paint the JKnob on the graphics context given.  The knob
+     * Paint the FreakkKnob on the graphics context given.  The knob
      * is a filled circle with a small filled circle offset 
      * within it to show the current angular position of the 
      * knob.
@@ -106,7 +102,7 @@ class JKnob
     /**
      * Return the ideal size that the knob would like to be.
      *
-     * @return the preferred size of the JKnob.
+     * @return the preferred size of the FreakkKnob.
      */
     public Dimension getPreferredSize() {
     	return new Dimension(2*radius,2*radius);
@@ -117,7 +113,7 @@ class JKnob
      * This is the same size as the preferred size so the
      * knob will be of a fixed size.
      *
-     * @return the minimum size of the JKnob.
+     * @return the minimum size of the FreakkKnob.
      */
     public Dimension getMinimumSize() {
     	return new Dimension(2*radius,2*radius);
@@ -296,18 +292,18 @@ class JKnob
 
     /**
      * Here main is used simply as a test method.  If this file
-     * is executed "java JKnob" then this main() method will be
-     * run.  However, if another file uses a JKnob as a component
+     * is executed "java FreakkKnob" then this main() method will be
+     * run.  However, if another file uses a FreakkKnob as a component
      * and that file is run then this main is ignored.
      */
     public static void main(String[] args) {
 
-	JFrame myFrame = new JFrame("JKnob Test method");
+	JFrame myFrame = new JFrame("FreakkKnob Test method");
 	
 	Container thePane = myFrame.getContentPane();
 	
-	// Add a JKnob to the pane.
-	JKnob knob = new JKnob();
+	// Add a FreakkKnob to the pane.
+	FreakkKnob knob = new FreakkKnob();
 	thePane.add(knob);
 	thePane.setPreferredSize(knob.getPreferredSize());
 	thePane.setMaximumSize(knob.getPreferredSize());

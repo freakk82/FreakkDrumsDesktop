@@ -4,6 +4,7 @@ import gnu.io.CommPortIdentifier;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
@@ -26,6 +27,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -85,7 +88,7 @@ public class MainWindow extends JFrame { // Your class name
 
 	// Constructors
 	// -----------------------------------
-	public MainWindow() throws MidiUnavailableException {
+	public MainWindow() throws MidiUnavailableException, InterruptedException {
 		super("FreakkDrums");
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -260,6 +263,7 @@ public class MainWindow extends JFrame { // Your class name
 			});
 			bottom.add(channels[i]);
 		}
+		
 		setVisible(true);
 
 	}
@@ -282,9 +286,8 @@ public class MainWindow extends JFrame { // Your class name
 	// Public Methods
 	// -----------------------------------
 	public static void main(String[] args) throws Exception {
+		
 		MainWindow w = new MainWindow();
-		// serialToMidi.StartSerialToMidi();
-
 	}
 
 	private class playBtnClick implements ActionListener {
@@ -332,7 +335,8 @@ public class MainWindow extends JFrame { // Your class name
 		if(vel>127) vel = 127;
 		if(!channels[channelIndex].isMute() && vel > channels[channelIndex].getGateThreshold()){ 
 			midiout.SendShortMessage(new ShortMessage(smsg.getCommand(), key, vel));
-			System.out.println(smsg.getCommand()+" "+key+" "+vel); // debug
+//			System.out.println(smsg.getCommand()+" "+key+" "+vel); // debug
+			channels[channelIndex].meter.setValuePercent((int)(100*(double) vel/127) );
 		}
 	}
 	

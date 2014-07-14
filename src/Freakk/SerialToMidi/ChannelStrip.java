@@ -1,8 +1,10 @@
 package Freakk.SerialToMidi;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -26,6 +28,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+
 import javax.swing.JSeparator;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
@@ -44,7 +47,7 @@ public class ChannelStrip extends JPanel{
 	final  boolean RIGHT_TO_LEFT = false;
 	public static int height = 400;
 	public static int width = 100; 
-	private  JKnob gateKnob;
+	private  FreakkKnob gateKnob;
 	private  int gain = 0;
 	private  int gateThreshold = 0;
 	
@@ -69,10 +72,13 @@ public class ChannelStrip extends JPanel{
 	private JComboBox comboBox;
 	private Component rigidArea_4;
 	private Component rigidArea_5;
+	private Component rigidArea_6;
+	
+	public FreakkLedMeter meter;
 	
 	// Constructors
 	// -----------------------------------
-	public ChannelStrip(String name, int w, int h){
+	public ChannelStrip(String name, int w, int h) throws InterruptedException{
 		
 		channelName = name;
 		width = w;
@@ -101,7 +107,7 @@ public class ChannelStrip extends JPanel{
 		add(separator);
 		add(Box.createRigidArea(new Dimension(10, 10)));
 		
-		gateKnob = new JKnob();
+		gateKnob = new FreakkKnob();
 		gateKnob.setValue(0);
 		gateKnob.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
@@ -112,13 +118,26 @@ public class ChannelStrip extends JPanel{
 			}
 		});
 		
+		JPanel gateAndMeterPanel = new JPanel();
+		gateAndMeterPanel.setBorder(new EmptyBorder(0, 15, 0, 0));
+		gateAndMeterPanel.setBackground(Color.BLACK);
+//		gateAndMeterPanel.setLayout(new GridLayout(0, 2, 0, 0));
+		gateAndMeterPanel.setLayout(new BorderLayout());
+		meter = new FreakkLedMeter(10,gateAndMeterPanel.getHeight());
+		meter.setSkin("blue");
+		gateAndMeterPanel.add(meter, BorderLayout.WEST);
+		
+		JPanel gatePanel = new JPanel();
+		gatePanel.setBackground(Color.BLACK);
+		gatePanel.setLayout(new BoxLayout(gatePanel, BoxLayout.Y_AXIS));
+		
 		lblGate = new JLabel("GATE");
 		lblGate.setForeground(Color.GRAY);
 		lblGate.setAlignmentX(Component.CENTER_ALIGNMENT);
-		add(lblGate);
 		
-		add(gateKnob);
-		
+		gatePanel.add(lblGate);
+		gatePanel.add(gateKnob);
+	
 		gateThresValue = new JTextField();
 		gateThresValue.setText("0");
 		gateThresValue.setHorizontalAlignment(SwingConstants.CENTER);
@@ -156,7 +175,12 @@ public class ChannelStrip extends JPanel{
 			       }
 			}
 		});
-		add(gateThresValue);
+			gatePanel.add(gateThresValue);
+			gateAndMeterPanel.add(gatePanel, BorderLayout.EAST);
+		
+		
+		add(gateAndMeterPanel);
+		
 		
 		rigidArea_1 = Box.createRigidArea(new Dimension(10, 10));
 		add(rigidArea_1);
@@ -294,11 +318,11 @@ public class ChannelStrip extends JPanel{
 		
 	}
 	
-	public ChannelStrip(String name){
+	public ChannelStrip(String name) throws InterruptedException{
 		this(name, width, height);
 	}
 
-	public ChannelStrip(){
+	public ChannelStrip() throws InterruptedException{
 		this("CH "+ (++channelNumber));
 		setBorder(new EmptyBorder(10, 10, 10, 10));
 	}
