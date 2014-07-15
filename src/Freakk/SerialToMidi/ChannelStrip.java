@@ -186,7 +186,7 @@ public class ChannelStrip extends JPanel{
 		add(rigidArea_1);
 		
 		separator_1 = new JSeparator();
-		separator_1.setForeground(Color.DARK_GRAY);
+		separator_1.setForeground(Color.GRAY);
 		separator_1.setBackground(Color.BLACK);
 		add(separator_1);
 
@@ -324,7 +324,7 @@ public class ChannelStrip extends JPanel{
 
 	public ChannelStrip() throws InterruptedException{
 		this("CH "+ (++channelNumber));
-		setBorder(new EmptyBorder(10, 10, 10, 10));
+		setBorder(new EmptyBorder(0, 10, 0, 10));
 	}
 	
 	// Private Methods

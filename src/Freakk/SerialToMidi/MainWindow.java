@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -47,6 +48,8 @@ import java.awt.Component;
 
 import javax.swing.Box;
 import javax.swing.border.EmptyBorder;
+import javax.swing.ImageIcon;
+import javax.swing.border.MatteBorder;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame { // Your class name
@@ -106,6 +109,7 @@ public class MainWindow extends JFrame { // Your class name
 		// Create Sub Panels
 		// TOP PANEL: Select Serial Port and MIDI Out
 		JPanel top = new JPanel();
+		top.setBorder(new EmptyBorder(10, 20, 0, 20));
 		top.setForeground(Color.GRAY);
 		top.setPreferredSize(topSize);
 		top.setMinimumSize(topSize);
@@ -113,11 +117,18 @@ public class MainWindow extends JFrame { // Your class name
 		top.setSize(topSize);
 		top.setBackground(Color.BLACK);
 		getContentPane().add(top, BorderLayout.PAGE_START);
-		top.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+//		top.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		top.setLayout(new GridLayout(0,3,20,0));
 		
 		// ------------------------------------------------ 
 		// 	SERIAL MIDI IN READER 
 		// ------------------------------------------------
+		JPanel portPanel = new JPanel();
+		portPanel.setBackground(Color.BLACK);
+		portPanel.setLayout(
+			    new BoxLayout(portPanel, BoxLayout.PAGE_AXIS)
+				);
+		
         List<String> serialPorts = new ArrayList<String>();
         @SuppressWarnings("unchecked")
 		Enumeration<CommPortIdentifier> ports = CommPortIdentifier.getPortIdentifiers();
@@ -128,7 +139,8 @@ public class MainWindow extends JFrame { // Your class name
                 }
         }
         JComboBox serialPortCombo = new JComboBox(serialPorts.toArray());
-		serialPortCombo.setPreferredSize(new Dimension(180, 20));
+        serialPortCombo.setMaximumRowCount(1);
+		serialPortCombo.setPreferredSize(new Dimension(180, 10));
 		serialPortCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 //
@@ -151,6 +163,11 @@ public class MainWindow extends JFrame { // Your class name
 		// ------------------------------------------------ 
 		// 	MIDI OUT 
 		// ------------------------------------------------
+		JPanel midiPanel = new JPanel();
+		midiPanel.setBackground(Color.BLACK);
+		midiPanel.setLayout(
+			    new BoxLayout(midiPanel, BoxLayout.PAGE_AXIS)
+				);
 		info = MidiSystem.getMidiDeviceInfo();
 		devices = new ArrayList<MidiDevice>();
 		List<String> midiPortNamesList = new ArrayList<String>();
@@ -188,17 +205,31 @@ public class MainWindow extends JFrame { // Your class name
         });
 
 		JLabel serialPortLabel = new JLabel("Input Port");
+		serialPortLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		serialPortLabel.setForeground(Color.LIGHT_GRAY);
-		top.add(serialPortLabel);
-		top.add(serialPortCombo);
-
-		Component horizontalGlue = Box.createHorizontalGlue();
-		top.add(horizontalGlue);
+		portPanel.add(serialPortLabel);
+		portPanel.add(serialPortCombo);
+		top.add(portPanel);
+		
+		Component rigidArea = Box.createRigidArea(new Dimension(20, 30));
+		portPanel.add(rigidArea);
 
 		JLabel MidiOutLabel = new JLabel("MIDI Out Port");
+		MidiOutLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		MidiOutLabel.setForeground(Color.LIGHT_GRAY);
-		top.add(MidiOutLabel);
-		top.add(midiOutCombo);
+		midiPanel.add(MidiOutLabel);
+		midiPanel.add(midiOutCombo);
+		top.add(midiPanel);
+		
+		Component rigidArea_1 = Box.createRigidArea(new Dimension(20, 30));
+		midiPanel.add(rigidArea_1);
+		
+		JLabel FreakkLogoLabel = new JLabel("");
+		FreakkLogoLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		FreakkLogoLabel.setIcon(new ImageIcon(MainWindow.class.getResource("/images/FreakkDrumsLogo.png")));
+		FreakkLogoLabel.setBackground(Color.BLACK);
+		top.add(FreakkLogoLabel);
+		
 
 		JPanel bottom = new JPanel();
 		bottom.setBorder(new EmptyBorder(0, 10, 0, 10));
