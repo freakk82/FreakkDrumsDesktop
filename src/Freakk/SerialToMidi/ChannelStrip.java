@@ -28,6 +28,8 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JSeparator;
 import javax.swing.border.LineBorder;
@@ -45,17 +47,9 @@ public class ChannelStrip extends JPanel{
 	final  boolean shouldFill = true;
 	final  boolean shouldWeightX = true;
 	final  boolean RIGHT_TO_LEFT = false;
-	public static int height = 400;
-	public static int width = 100; 
 	private  FreakkKnob gateKnob;
 	private  int gain = 0;
 	private  int gateThreshold = 0;
-	
-	// Public Fields
-	// -----------------------------------
-	public JCheckBox muteCheckBox;
-	public JSlider slider;
-	public JButton playBtn;
 	private JTextField gainValue;
 	private Component rigidArea;
 	private JTextField gateThresValue;
@@ -74,11 +68,30 @@ public class ChannelStrip extends JPanel{
 	private Component rigidArea_5;
 	private Component rigidArea_6;
 	
+	// Public Fields
+	// -----------------------------------
+	public JCheckBox muteCheckBox;
+	public JSlider slider;
+	public JButton playBtn;
+	public static int height = 400;
+	public static int width = 100; 
+	
 	public FreakkLedMeter meter;
+	
+	private final String [] notes = {
+				"C-1","C#-1","D-1","D#-1","E-1","F-1","F#-1","G-1","G#-1","A-1","A#-1","B-1",
+				"C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
+				"C1","C#1","D1","D#1","E1","F1","F#1","G1","G#1","A1","A#1","B1",
+				"C2","C#2","D2","D#2","E2","F2","F#2","G2","G#2","A2","A#2","B2",
+				"C3","C#3","D3","D#3","E3","F3","F#3","G3","G#3","A3","A#3","B3",
+				"C4","C#4","D4","D#4","E4","F4","F#4","G4","G#4","A4","A#4","B4"
+				};
+	private final static int lowNote = 12; // C-1
+	private Map<String, Integer> noteValues;
 	
 	// Constructors
 	// -----------------------------------
-	public ChannelStrip(String name, int w, int h) throws InterruptedException{
+	public ChannelStrip(String name, int note, int w, int h) throws InterruptedException{
 		
 		channelName = name;
 		width = w;
@@ -95,7 +108,11 @@ public class ChannelStrip extends JPanel{
 		lblMute.setForeground(Color.GRAY);
 		add(lblMute);
 		
-		comboBox = new JComboBox();
+		// MIDI Note remap
+		initNoteValues();
+		comboBox = new JComboBox(notes);
+		comboBox.setSelectedIndex(note - lowNote);
+		
 		add(comboBox);
 		
 		rigidArea_4 = Box.createRigidArea(new Dimension(10, 10));
@@ -319,7 +336,7 @@ public class ChannelStrip extends JPanel{
 	}
 	
 	public ChannelStrip(String name) throws InterruptedException{
-		this(name, width, height);
+		this(name, lowNote, width, height);
 	}
 
 	public ChannelStrip() throws InterruptedException{
@@ -329,7 +346,27 @@ public class ChannelStrip extends JPanel{
 	
 	// Private Methods
 	// -----------------------------------
-		
+	
+	public void initNoteValues(){
+		noteValues = new HashMap<String, Integer>(); 
+		int note = lowNote; // C-1
+
+		for(int i=-1 ; i<=4 ; ++i){
+		 noteValues.put("C"+i,note++);
+		 noteValues.put("C#"+i,note++);
+		 noteValues.put("D"+i,note++);
+		 noteValues.put("D#"+i,note++);
+		 noteValues.put("E"+i,note++);
+		 noteValues.put("F"+i,note++);
+		 noteValues.put("F#"+i,note++);
+		 noteValues.put("G"+i,note++);
+		 noteValues.put("G#"+i,note++);
+		 noteValues.put("A"+i,note++);
+		 noteValues.put("A#"+i,note++);
+		 noteValues.put("B"+i,note++);
+		}
+	}
+	
 	// Public Methods
 	// -----------------------------------
     public void setWidth(int w){
@@ -351,6 +388,10 @@ public class ChannelStrip extends JPanel{
     }
     public boolean isMute(){
     	return muteCheckBox.isSelected();
+    }
+    
+    public int getNote(){
+    	return noteValues.get(comboBox.getSelectedItem());
     }
     
 }

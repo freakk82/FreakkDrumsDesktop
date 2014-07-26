@@ -227,7 +227,7 @@ public class MainWindow extends JFrame { // Your class name
 		JLabel FreakkLogoLabel = new JLabel("");
 		FreakkLogoLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		FreakkLogoLabel.setIcon(new ImageIcon(MainWindow.class.getResource("/images/FreakkDrumsLogo.png")));
-		FreakkLogoLabel.setBackground(Color.BLACK);
+		FreakkLogoLabel.setBackground(Color.RED);
 		top.add(FreakkLogoLabel);
 		
 
@@ -244,7 +244,7 @@ public class MainWindow extends JFrame { // Your class name
 
 		// Add Channel Strips
 		for (int i = 0; i < numChannels; i++) {
-			channels[i] = new ChannelStrip(channelNames.get(i),
+			channels[i] = new ChannelStrip(channelNames.get(i), channelNoteValues.get(i),
 					(int) (bottom.getWidth()) / numChannels, bottom.getHeight());
 //			channels[i].playBtn.addActionListener(new playBtnClick(noteValues
 //					.get(channelNames.get(i))));
@@ -360,6 +360,7 @@ public class MainWindow extends JFrame { // Your class name
 		int key = smsg.getData1();
 		int vel = smsg.getData2();
 		int channelIndex = channelNoteValues.indexOf(key);
+		key = channels[channelIndex].getNote();
 		//Apply Gain boost/cut
 		float gain = 1+(float)channels[channelIndex].getGain()/10.0f; // apply velocity multiplier from 0 to 3
 		vel = (int)(vel*gain);
