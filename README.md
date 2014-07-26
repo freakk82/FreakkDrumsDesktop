@@ -10,6 +10,6 @@ Features:
 - Gain boost/cut
 - Gate
 - Mute
-- Note remapping on every pad ( to do )
+- Pad note remapping
     
 
